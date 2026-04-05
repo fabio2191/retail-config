@@ -11,5 +11,6 @@
     { "label": "30 minuti", "value": 1800000 },
     { "label": "1 ora", "value": 3600000 }
   ],
-  "defaultRefresh": 300000
+  "defaultRefresh": 300000,
+  "password": "U3VwZXJTZWdyZXRhMTIz"
 }

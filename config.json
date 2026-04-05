@@ -1,5 +1,5 @@
 {
-  "configPassword": "TuaPassword123",
+  "configPassword": "TuaPassword1234",
   "servers": [
     { "name": "IP VPN", "ip": "10.13.50.2:3000" },
     { "name": "IP Pubblico", "ip": "195.201.17.78:3000" }

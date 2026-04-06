@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Retail Report Dashboard</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --primary: #1e90ff;
+  --bg: #f5f6fa;
+  --card: #fff;
+  --text: #2c3e50;
+  --border: #d1d8e0;
+}
+
+/* LAYOUT HEADER */
+.top-layout {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 30px;
+  align-items: start;
+  margin-bottom: 20px;
+}
+
+.logo-box {
+  width: 100%;
+  height: 180px;
+  border: 3px solid #000;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+}
+
+.logo-box img {
+  max-width: 90%;
+  max-height: 90%;
+  object-fit: contain;
+}
+
+.header-content h1 {
+  color: var(--primary);
+  margin-bottom: 10px;
+}
+
+.header-content .controls {
+  justify-content: flex-start;
+}
+
+.report-header {
+  text-align: left;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.wrapper {
+  max-width: 1200px;
+  margin: auto;
+  padding: 20px;
+}
+
+.controls {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+button, input, select {
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+button {
+  background: var(--primary);
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.card {
+  background: var(--card);
+  padding: 15px;
+  border-radius: 10px;
+  margin-bottom: 25px;
+  border: 1px solid var(--border);
+}
+
+.section-title {
+  font-weight: 600;
+  border-bottom: 2px solid var(--primary);
+  margin-bottom: 10px;
+}
+
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.img-block {
+  width: 100%;
+  object-fit: contain;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+
+.img-kpi { height: 200px; }
+
+.img-vendite {
+  width: 100%;
+  height: 260px;
+  object-fit: contain;
+  display: block;
+  margin: 0 auto;
+}
+.img-iva {
+  width: 100%;
+  height: 260px;
+  object-fit: contain;
+  display: block;
+  margin: 0 auto;
+}
+.img-reparti {
+  width: 80%;
+  height: 600px;
+  object-fit: contain;
+  display: block;
+  margin: 0 auto;
+}
+
+/* Nuova regola per affiancare card vendite e IVA */
+.card-row {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+.card-row .card {
+  flex: 1 1 45%;
+}
+
+/* MODALE */
+.modal {
+  display: none;
+  position: fixed;
+  background: rgba(0,0,0,0.5);
+  width: 100%;
+  height: 100%;
+  top: 0;
+}
+
+.modal-content {
+  background: white;
+  padding: 25px;
+  margin: 5% auto;
+  width: 360px;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.offline-msg {
+  color: red;
+  text-align: center;
+  display: none;
+}
+
+/* LOADER */
+.loader {
+  display:none;
+  position:fixed;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  z-index:9999;
+}
+
+/* PRINT */
+@media print {
+  body { background: white; }
+  .controls, .modal, .loader { display:none !important; }
+  .card { page-break-inside: avoid; border:none; }
+}
+</style>
+</head>
+
+<body>
+
+<div class="wrapper">
+
+<div class="top-layout">
+  
+  <div class="logo-box">
+    <img id="companyLogo" src="">
+  </div>
+
+  <div class="header-content">
+    <h1>Retail Dashboard</h1>
+
+    <div class="controls">
+      <input type="date" id="date">
+      <button onclick="updateReport()">Aggiorna</button>
+      <button onclick="openPasswordModal()">Configurazione</button>
+      <button onclick="window.print()">Stampa</button>
+    </div>
+
+    <div class="report-header">
+      <h2>Report Punto Vendita</h2>
+      <div id="subtitle"></div>
+    </div>
+  </div>
+
+</div>
+
+<div class="card">
+  <div class="section-title">KPI Negozio</div>
+  <div class="kpi-grid">
+    <img id="kpi1" class="img-block img-kpi">
+    <img id="kpi2" class="img-block img-kpi">
+    <img id="kpi3" class="img-block img-kpi">
+    <img id="kpi4" class="img-block img-kpi">
+  </div>
+</div>
+
+<!-- NUOVO WRAPPER PER AFFIANCAMENTO -->
+<div class="card-row">
+  <div class="card">
+    <div class="section-title">Riepilogo Forme di Pagamento</div>
+    <img id="img1" class="img-block img-vendite">
+  </div>
+
+  <div class="card">
+    <div class="section-title">Riepilogo IVA</div>
+    <img id="img3" class="img-block img-iva">
+  </div>
+</div>
+
+<div class="card">
+  <div class="section-title">Vendite Reparti</div>
+  <img id="imgReparti" class="img-block img-reparti">
+</div>
+
+</div>
+
+<!-- PASSWORD -->
+<div id="passwordModal" class="modal">
+  <div class="modal-content">
+    <h3>Password</h3>
+    <input type="password" id="passwordInput">
+    <button onclick="checkPassword()">Entra</button>
+    <button onclick="closePasswordModal()">Chiudi</button>
+  </div>
+</div>
+
+<!-- CONFIG -->
+<div id="modal" class="modal">
+  <div class="modal-content">
+    <h3>Configurazione</h3>
+    <div id="offlineMsg" class="offline-msg">Modalità offline</div>
+
+    <select id="serverSelect"></select>
+    <select id="storeSelect"></select>
+    <select id="refreshSelect"></select>
+
+    <input type="file" id="logoUpload" accept="image/*">
+
+    <button onclick="saveConfig()">Salva</button>
+    <button onclick="closeConfig()">Chiudi</button>
+  </div>
+</div>
+
+<div class="loader" id="loader">
+  <img src="https://i.gifer.com/ZZ5H.gif">
+</div>
+
+<script>
+let remoteConfig = null;
+let stores = [];
+let config = JSON.parse(localStorage.getItem("config")) || {};
+
+const loader = document.getElementById("loader");
+
+function showLoader(){ loader.style.display="block"; }
+function hideLoader(){ loader.style.display="none"; }
+
+/* LOGO */
+function applyLogo(){
+  const logo = localStorage.getItem("companyLogo");
+  if(logo){
+    document.getElementById("companyLogo").src = logo;
+  }
+}
+
+/* PASSWORD */
+function openPasswordModal(){
+  passwordModal.style.display="block";
+}
+function closePasswordModal(){
+  passwordModal.style.display="none";
+}
+
+async function checkPassword(){
+  showLoader();
+  const cfg = await loadRemoteConfig();
+  hideLoader();
+
+  if(!cfg){
+    alert("Offline o config non caricata");
+    return;
+  }
+
+  const pwd = passwordInput.value;
+
+  if(pwd && pwd.trim() === cfg.configPassword.trim()){
+    closePasswordModal();
+    openConfigModal(cfg);
+  } else {
+    alert("Password errata");
+  }
+}
+
+/* FETCH */
+async function loadRemoteConfig(){
+  try{
+    const res = await fetch("https://raw.githubusercontent.com/fabio2191/retail-config/main/config.json?_t="+Date.now());
+    remoteConfig = await res.json();
+    return remoteConfig;
+  }catch{
+    return null;
+  }
+}
+
+async function loadStores(){
+  try{
+    const res = await fetch("https://raw.githubusercontent.com/fabio2191/retail-config/main/stores.json?_t="+Date.now());
+    stores = await res.json();
+  }catch{
+    stores = [];
+  }
+}
+
+/* CONFIG */
+async function openConfigModal(cfg){
+  await loadStores();
+
+  serverSelect.innerHTML="";
+  storeSelect.innerHTML="";
+  refreshSelect.innerHTML="";
+
+  cfg.servers.forEach(s=>{
+    serverSelect.innerHTML += `<option value="${s.ip}">${s.name}</option>`;
+  });
+
+  stores.forEach(s=>{
+    storeSelect.innerHTML += `<option value="${s.name}">${s.name}</option>`;
+  });
+
+  cfg.refreshOptions.forEach(r=>{
+    refreshSelect.innerHTML += `<option value="${r.value}">${r.label}</option>`;
+  });
+
+  modal.style.display="block";
+}
+
+function closeConfig(){ modal.style.display="none"; }
+
+function saveConfig(){
+  config.serverIp = serverSelect.value;
+  config.storeName = storeSelect.value;
+
+  const file = logoUpload.files[0];
+  if(file){
+    const reader = new FileReader();
+    reader.onload = e => {
+      localStorage.setItem("companyLogo", e.target.result);
+      applyLogo();
+    };
+    reader.readAsDataURL(file);
+  }
+
+  localStorage.setItem("config", JSON.stringify(config));
+  closeConfig();
+  updateReport();
+}
+
+/* REPORT */
+function getBaseUrls(){
+  const ip = config.serverIp;
+  return {
+    BASE_1:`http://${ip}/render/d-solo/uOy-gI7Sk/home-dashboard?var-Store=${config.storeName}`,
+    BASE_3:`http://${ip}/render/d-solo/000000001/dashboard-azienda?var-store=${config.storeName}`,
+    BASE_STORE:`http://${ip}/render/d-solo/oJsie84iz/store-details?var-store=${stores.find(s=>s.name===config.storeName)?.id||0}`
+  };
+}
+
+function setImg(id,src){
+  const img = document.getElementById(id);
+  img.onload = hideLoader;
+  img.onerror = hideLoader;
+  img.src = src;
+}
+
+function updateReport(){
+  if(!config.serverIp || !config.storeName) return;
+
+  showLoader();
+
+  const date=document.getElementById("date").value;
+  if(!date){ hideLoader(); return; }
+
+  const from=new Date(date).setHours(0,0,0,0);
+  const to=new Date(date).setHours(23,59,59,999);
+
+  const {BASE_1,BASE_3,BASE_STORE}=getBaseUrls();
+  const noCache="&_t="+Date.now();
+
+  subtitle.innerText =
+    `${new Date(date).toLocaleDateString('it-IT')} | ${config.storeName}`;
+
+  setImg("img1", `${BASE_1}&from=${from}&to=${to}&panelId=10${noCache}&width=700&height=300`);
+  setImg("kpi1",`${BASE_STORE}&from=${from}&to=${to}&panelId=8${noCache}`);
+  setImg("kpi2",`${BASE_STORE}&from=${from}&to=${to}&panelId=11${noCache}`);
+  setImg("kpi3",`${BASE_STORE}&from=${from}&to=${to}&panelId=12${noCache}`);
+  setImg("kpi4",`${BASE_STORE}&from=${from}&to=${to}&panelId=13${noCache}`);
+  setImg("img3",`${BASE_3}&from=${from}&to=${to}&panelId=14${noCache}&width=700&height=300`);
+
+  const baseReparti=`http://${config.serverIp}/render/d-solo/uOy-gI7Sk/home-dashboard?var-Store=${config.storeName}`;
+
+  setImg("imgReparti",`${baseReparti}&from=${from}&to=${to}&panelId=4${noCache}&width=900&height=750`);
+}
+
+/* INIT */
+date.value=new Date().toISOString().split('T')[0];
+applyLogo();
+</script>
+
+</body>
+</html>

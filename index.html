@@ -331,10 +331,9 @@ async function checkPassword(){
   }
 }
 
-/* FETCH */
 async function loadRemoteConfig(){
   try{
-    const res = await fetch("https://raw.githubusercontent.com/fabio2191/retail-config/main/config.json?_t="+Date.now());
+    const res = await fetch("./config.json?_t="+Date.now());
     remoteConfig = await res.json();
     return remoteConfig;
   }catch{
@@ -344,7 +343,7 @@ async function loadRemoteConfig(){
 
 async function loadStores(){
   try{
-    const res = await fetch("https://raw.githubusercontent.com/fabio2191/retail-config/main/stores.json?_t="+Date.now());
+    const res = await fetch("./stores.json?_t="+Date.now());
     stores = await res.json();
   }catch{
     stores = [];
